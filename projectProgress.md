@@ -1,8 +1,9 @@
 # Movie Database Management System — Project Roadmap
 
 > **Course:** Weird Web Class Spring 2026  
-> **Repo:** `raw_webMaster_Project1_2026_Spring`  
-> **Stack:** PHP · HTML · CSS · MySQL (via XAMPP/phpMyAdmin + DBeaver) · GitHub Pages  
+> **Repo:** [`raw_webMaster_Project1_2026_Spring`](https://github.com/jmcnealstudentclayton-boop/raw_webMaster_Project1_2026_Spring)  
+> **GitHub Pages:** https://jmcnealstudentclayton-boop.github.io/raw_webMaster_Project1_2026_Spring/  
+> **Stack:** PHP · HTML · CSS · MySQL 8.4 (standalone) · Apache (via XAMPP) · GitHub Pages  
 
 ---
 
@@ -19,7 +20,7 @@ A movie database management system that lets users browse movies, manage a watch
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| 1.1 | Import `moviedb.sql` into phpMyAdmin / DBeaver | ⬜ Not Started | Review schema; note NOT NULL fields |
+| 1.1 | Import `moviedb.sql` into phpMyAdmin / DBeaver | ✅ Complete | Imported via phpMyAdmin into MySQL 8.4 — 6 tables, 200 movies, 16 genres, 50 users |
 | 1.2 | Create project folder structure | ⬜ Not Started | `/css`, `/includes`, `/pages`, `/images` |
 | 1.3 | Build shared header/nav (`includes/header.php`) | ⬜ Not Started | Consistent nav across pages |
 | 1.4 | Build shared footer (`includes/footer.php`) | ⬜ Not Started | |
@@ -97,16 +98,108 @@ rawProject/
 
 ---
 
+## Local Dev Environment Setup
+
+### Architecture Overview
+
+We use **two separate services** — not XAMPP's bundled MariaDB:
+
+| Service | What | How it runs | Auto-start? |
+|---------|------|-------------|-------------|
+| **MySQL 8.4.8** | Real MySQL database server | Windows Service (`MySQL84`) | ✅ Yes — starts with Windows |
+| **Apache** | Web server that executes PHP files | XAMPP control panel | ❌ No — start manually in XAMPP |
+
+**Why not XAMPP's MySQL?** XAMPP bundles MariaDB, not real MySQL. The `moviedb.sql` uses `utf8mb4_0900_ai_ci` collation which requires MySQL 8.0+. MariaDB doesn't support it.
+
+**Daily workflow:** Open XAMPP → Start Apache only. MySQL is already running in the background.
+
+### Checking MySQL Status
+
+- **Windows Services:** `Win+R` → `services.msc` → find `MySQL84` → shows Running/Stopped
+- **Terminal:** `Get-Service MySQL84` → shows status
+- **MySQL path:** `C:\Program Files\MySQL\MySQL Server 8.4\bin\`
+
+### Symlink (already configured)
+
+The project files live in the Git-tracked workspace folder. A **symbolic link** connects them to XAMPP's `htdocs` so Apache can serve them:
+
+```
+C:\xampp\htdocs\rawProject\  →  (symlink)  →  C:\Users\justi\OneDrive\Desktop\Justin\classes\weirdWebClassS2026\rawProject\
+```
+
+- **Edit files** in this workspace folder (VS Code)
+- **Git push** from this same folder
+- **Apache serves** from `http://localhost/rawProject/`
+- No copying or syncing needed — they're the same files
+
+> **Note:** Live Server (VS Code extension) only works for static HTML/CSS — it cannot execute PHP.  
+> **Note:** GitHub Pages is static-only too — useful for docs, not the PHP app.
+
+### SQLTools Connection (VS Code)
+
+| Field | Value |
+|-------|-------|
+| **Connection Name** | `XAMPP MySQL` (or anything you like) |
+| **Connect Using** | Server and Port |
+| **Server Address** | `127.0.0.1` |
+| **Port** | `3306` |
+| **Database** | `moviedb` |
+| **Username** | `root` |
+| **Password** | *(leave blank — no password)* |
+
+#### Browsing the DB in SQLTools (DBeaver-like)
+
+1. **Sidebar:** Click the database cylinder icon → expand connection → expand `moviedb` → expand **Tables**
+2. **View data:** Right-click any table → **Show Table Records** (opens a data grid)
+3. **See structure:** Right-click table → **Describe Table** (columns, types, nullability, keys)
+4. **Run queries:** Right-click connection → **New SQL File** → write SQL → select it → `Ctrl+E, Ctrl+E`
+
+### Browser URLs
+
+| URL | What it opens |
+|-----|---------------|
+| `http://localhost/rawProject/` | Your project (once you have an `index.php`) |
+| `http://localhost/phpmyadmin/` | phpMyAdmin (DB admin GUI) |
+
+---
+
 ## Tools & Environment
 
 | Tool | Purpose |
 |------|---------|
-| **XAMPP** | Local Apache + MySQL server; runs PHP pages at `localhost` |
-| **phpMyAdmin** | Web GUI for MySQL (bundled with XAMPP) |
+| **XAMPP** | Apache web server (for PHP); **do NOT use XAMPP's MySQL — use standalone MySQL 8.4 instead** |
+| **MySQL 8.4** | Standalone MySQL server (Windows Service `MySQL84`) — supports `utf8mb4_0900_ai_ci` |
+| **phpMyAdmin** | Web GUI for MySQL (bundled with XAMPP) — used to import `moviedb.sql` |
 | **DBeaver** | Desktop SQL client for deeper DB work |
 | **VS Code** | Code editor |
-| **GitHub Pages** | Static hosting / project showcase |
-| **GitHub (`gh` CLI)** | Version control & collaboration |
+| **SQLTools + MySQL driver (VS Code)** | MySQL client inside VS Code — browse tables, run queries, DBeaver-like sidebar |
+| **PHP Intelephense (VS Code)** | PHP autocomplete, linting, go-to-definition |
+
+## Database Info
+
+- **Database name:** `moviedb`
+- **MySQL version:** 8.4.8 (standalone, not XAMPP's MariaDB)
+- **Collation:** `utf8mb4_0900_ai_ci`
+- **Imported via:** phpMyAdmin (`http://localhost/phpmyadmin/`)
+
+### Tables & Record Counts
+
+| Table | Records | Description |
+|-------|---------|-------------|
+| `genres` | 16 | Genre categories (Action, Comedy, etc.) |
+| `movies` | 200 | Movie catalog with titles, ratings, directors |
+| `movie_genres` | — | Junction table linking movies ↔ genres |
+| `users` | 50 | User accounts |
+| `watchlist` | — | Users' saved movies |
+| `reviews` | — | User-written movie reviews |
+
+### Default MySQL Databases (system — don't touch)
+
+| Database | Purpose |
+|----------|---------|
+| `mysql` | Internal accounts, permissions, server config |
+| `phpmyadmin` | phpMyAdmin UI settings/bookmarks |
+| `test` | Empty placeholder — can ignore |
 
 ---
 

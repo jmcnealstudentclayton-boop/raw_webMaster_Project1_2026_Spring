@@ -1,0 +1,19 @@
+.mainBody {
+    background-color: rgb(15, 23, 42);   
+    color: rgb(226, 232, 240);         
+    display: flex;                       
+    flex-direction: column;               
+    min-height: 100vh;                    
+}
+
+.mainMain {
+    flex: 1 1 0%;
+    width: 100%;
+    max-width: 72rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
