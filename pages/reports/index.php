@@ -16,15 +16,22 @@
 
 
 
-        <div class="mt-3">
-            <p>Justin's Report: <span class="text-slate-400 italic">"Top-Rated Action Movies"</span></p>
-            <p>Quincie's Report: <span class="text-slate-400 italic">"User Review Activity"</span></p>
-            <p>Jayse's Report: <span class="text-slate-400 italic">"Most Watchlisted Movies This Month"</span></p>
+        <div class="mt-3 space-y-2">
+            <div class="bg-slate-800 p-4 rounded-lg flex items-center justify-between">
+                <div>
+                    <span class="font-semibold">Justin's Report:</span>
+                    <span class="text-slate-400 italic ml-2">"Top-Rated Action Movies"</span>
+                </div>
+                <a href="justin.php" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg">View Report</a>
+            </div>
+            <div class="bg-slate-800 p-4 rounded-lg flex items-center justify-between">
+                <div>
+                    <span class="font-semibold">Jayse's Report:</span>
+                    <span class="text-slate-400 italic ml-2">"TBD"</span>
+                </div>
+                <span class="px-4 py-2 bg-slate-600 text-slate-400 text-sm font-semibold rounded-lg cursor-not-allowed">Coming Soon</span>
+            </div>
         </div>
-
-
-
-        <!-- reports management interface -->
          
     </main>
     <?php include '../../pageInserts/footer.php'; ?>

@@ -39,19 +39,20 @@
 <h2 class="text-2xl font-bold mb-4">Featured Movies</h2>
 <div class="grid grid-cols-5 gap-5 mb-10">
 
-<?php 
-$query = "SELECT title, director, imdb_rating, poster_url FROM movies ORDER BY imdb_rating DESC LIMIT 5";
-$result = mysqli_query($conn, $query);
+<?php
+$stmt = $pdo->prepare("SELECT title, director, imdb_rating, poster_url FROM movies ORDER BY imdb_rating DESC LIMIT 5");
+$stmt->execute();
+$movies = $stmt->fetchAll();
 ?>
 
-<?php while($row = mysqli_fetch_assoc($result)) { ?>
+<?php foreach($movies as $row): ?>
     <div class="bg-slate-800 border border-slate-700 rounded-lg p-4">
         <img src="<?php echo htmlspecialchars($row['poster_url']); ?>" alt="<?php echo htmlspecialchars($row['title']); ?> Poster" class="w-full h-64 object-cover mb-3 rounded">
         <h3 class="text-lg font-semibold mb-1"><?php echo htmlspecialchars($row['title']); ?></h3>
         <p class="text-slate-400 text-sm mb-1">Directed by <?php echo htmlspecialchars($row['director']); ?></p>
         <p class="text-slate-400 text-sm">IMDb Rating: <?php echo htmlspecialchars($row['imdb_rating']); ?></p>
 </div>
-<?php } ?>
+<?php endforeach; ?>
 </div>
 
 

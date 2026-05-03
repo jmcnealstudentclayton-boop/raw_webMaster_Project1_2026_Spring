@@ -126,17 +126,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit_review'])) {
     <div class="grid grid-cols-5 gap-5 mb-10">
 
         <?php
-        $query =
+        // get the 20 most recent reviews with movie title and reviewer name
+        $stmt = $pdo->prepare(
             "SELECT r.rating, r.review_text, r.review_date,
                     m.title, u.first_name, u.last_name
             FROM reviews r
-            JOIN movies m on r.movie_id = m.movie_id
+            JOIN movies m ON r.movie_id = m.movie_id
             JOIN users u ON r.user_id = u.user_id
-            ORDER BY r.review_date DESC";
-        $result = mysqli_query($conn, $query);
+            ORDER BY r.review_date DESC
+            LIMIT 20"
+        );
+        $stmt->execute();
+        $reviews = $stmt->fetchAll();
         ?>
-
-        <?php while ($row = mysqli_fetch_assoc($result)) { ?>
+        <?php foreach ($reviews as $row): ?>
             <div class="bg-slate-800 border border-slate-700 rounded-lg p-4">
                 <h3 class="text-lg font-semibold mb-1"><?php echo htmlspecialchars($row['title']); ?></h3>
                 <p class="text-slate-400 text-sm mb-1">Reviewed by
@@ -145,8 +148,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit_review'])) {
                 <p class="text-slate-400 text-sm mb-1">Rating: <?php echo htmlspecialchars($row['rating']); ?>/5</p>
                 <p class="text-slate-400 text-sm"><?php echo htmlspecialchars($row['review_text']); ?></p>
             </div>
-        <?php } ?>
+        <?php endforeach; ?>
     </div>
-    <?php include '../../pageInserts/footer.php'; ?>
+    
     </main>
+    <?php include '../../pageInserts/footer.php'; ?>
 </body>
+</html>

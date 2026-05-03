@@ -68,6 +68,14 @@ function validateSubscription($value, $allowed = ALLOWED_SUBSCRIPTIONS) {
     return '';
 }
 
+// checks if a name contains only letters, spaces, hyphens, and apostrophes
+function validateName($value, $fieldName) {
+    if (!preg_match("/^[a-zA-Z\s\-']+$/", trim($value))) {
+        return "$fieldName may only contain letters, spaces, hyphens, and apostrophes.";
+    }
+    return '';
+}
+
 // formats first and last name for display
 function formatName($first_name, $last_name) {
     $first_name = ucwords(strtolower(trim($first_name)));
@@ -99,8 +107,14 @@ function validateUserData($data, $requireId = false) {
     if (!$errors['first_name']) {
         $errors['first_name'] = validateLength($data['first_name'], 'First name', 1, MAX_NAME_LENGTH);
     }
+    if (!$errors['first_name']) {
+        $errors['first_name'] = validateName($data['first_name'], 'First name');
+    }
     if (!$errors['last_name']) {
         $errors['last_name'] = validateLength($data['last_name'], 'Last name', 1, MAX_NAME_LENGTH);
+    }
+    if (!$errors['last_name']) {
+        $errors['last_name'] = validateName($data['last_name'], 'Last name');
     }
     if (!$errors['email']) {
         $errors['email'] = validateLength($data['email'], 'Email', 1, MAX_EMAIL_LENGTH);

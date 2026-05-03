@@ -69,19 +69,20 @@ if (isset($_GET['search'])) {
             <?php
             // search the database for movies matching the search term
             $search_param = '%' . $searchValue . '%';
-            $query = "SELECT title, director, imdb_rating, poster_url FROM movies WHERE title LIKE '" . mysqli_real_escape_string($conn, $search_param) . "' ORDER BY imdb_rating DESC";
-            $result = mysqli_query($conn, $query);
+            $stmt = $pdo->prepare("SELECT * FROM movies WHERE title LIKE :search ORDER BY imdb_rating DESC");
+            $stmt->execute(['search' => $search_param]);
+            $movies = $stmt->fetchAll();
             ?>
 
-            <?php if (mysqli_num_rows($result) > 0): ?>
-                <?php while($row = mysqli_fetch_assoc($result)) { ?>
+            <?php if (count($movies) > 0): ?>
+                <?php foreach($movies as $row): ?>
                     <div class="bg-slate-800 border border-slate-700 rounded-lg p-4">
                         <img src="<?php echo htmlspecialchars($row['poster_url']); ?>" alt="<?php echo htmlspecialchars($row['title']); ?> Poster" class="w-full h-64 object-cover mb-3 rounded">
                         <h3 class="text-lg font-semibold mb-1"><?php echo htmlspecialchars($row['title']); ?></h3>
                         <p class="text-slate-400 text-sm mb-1">Directed by <?php echo htmlspecialchars($row['director']); ?></p>
                         <p class="text-slate-400 text-sm">IMDb Rating: <?php echo htmlspecialchars($row['imdb_rating']); ?></p>
                     </div>
-                <?php } ?>
+                <?php endforeach; ?>
             <?php else: ?>
                 <p class="text-slate-400 text-sm col-span-5">No movies found matching your search.</p>
             <?php endif; ?>

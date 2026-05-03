@@ -7,6 +7,7 @@ require_once '../../pageInserts/validation.php';
 $searchError = '';
 $searchSuccess = '';
 $searchValue = '';
+$searchResults = [];
 
 if (isset($_GET['search'])) {
     // grab the search input
@@ -19,10 +20,22 @@ if (isset($_GET['search'])) {
         $searchError = 'Search must be at least ' . MIN_SEARCH_LENGTH . ' characters.';
     }
 
-    // if no errors, sanitize and show success
+    // if no errors, sanitize and query the database
     if (!$searchError) {
         $searchValue = sanitize($searchValue);
-        $searchSuccess = 'Showing results for: "' . $searchValue . '"';
+        try {
+            $stmt = $pdo->prepare(
+                "SELECT title, director, release_year, imdb_rating, poster_url
+                 FROM movies
+                 WHERE title LIKE :search
+                 ORDER BY imdb_rating DESC"
+            );
+            $stmt->execute([':search' => '%' . $searchValue . '%']);
+            $searchResults = $stmt->fetchAll();
+            $searchSuccess = 'Showing ' . count($searchResults) . ' result(s) for: "' . htmlspecialchars($searchValue) . '"';
+        } catch (PDOException $e) {
+            $searchError = 'Database error. Please try again.';
+        }
     }
 }
 
@@ -58,11 +71,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_user'])) {
     // check if there were any errors
     $has_errors = implode($addErrors);
     if (!$has_errors) {
-        // no errors so show success and clear the form
-        $addSuccess = 'User "' . formatName($addData['first_name'], $addData['last_name']) . '" added successfully!';
-        $addData = [
-            'first_name' => '', 'last_name' => '', 'email' => '', 'subscription_type' => 'free'
-        ];
+        try {
+            $stmt = $pdo->prepare(
+                "INSERT INTO users (first_name, last_name, email, subscription_type, join_date)
+                 VALUES (:first_name, :last_name, :email, :subscription_type, CURDATE())"
+            );
+            $stmt->execute([
+                ':first_name'        => $addData['first_name'],
+                ':last_name'         => $addData['last_name'],
+                ':email'             => $addData['email'],
+                ':subscription_type' => $addData['subscription_type']
+            ]);
+            $newId = $pdo->lastInsertId();
+            $addSuccess = 'User "' . htmlspecialchars(formatName($addData['first_name'], $addData['last_name'])) . '" added successfully! (ID: ' . $newId . ')';
+            $addData = [
+                'first_name' => '', 'last_name' => '', 'email' => '', 'subscription_type' => 'free'
+            ];
+        } catch (PDOException $e) {
+            $addErrors['email'] = 'That email address is already in use.';
+        }
     }
 }
 
@@ -101,11 +128,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_user'])) {
     // check if there were any errors
     $has_errors = implode($updateErrors);
     if (!$has_errors) {
-        // no errors so show success and clear the form
-        $updateSuccess = 'User "' . formatName($updateData['first_name'], $updateData['last_name']) . '" updated successfully!';
-        $updateData = [
-            'user_id' => '', 'first_name' => '', 'last_name' => '', 'email' => '', 'subscription_type' => 'free'
-        ];
+        try {
+            $stmt = $pdo->prepare(
+                "UPDATE users
+                 SET first_name = :first_name,
+                     last_name = :last_name,
+                     email = :email,
+                     subscription_type = :subscription_type
+                 WHERE user_id = :user_id"
+            );
+            $stmt->execute([
+                ':first_name'        => $updateData['first_name'],
+                ':last_name'         => $updateData['last_name'],
+                ':email'             => $updateData['email'],
+                ':subscription_type' => $updateData['subscription_type'],
+                ':user_id'           => $updateData['user_id']
+            ]);
+            if ($stmt->rowCount() > 0) {
+                $updateSuccess = 'User ID ' . htmlspecialchars($updateData['user_id']) . ' ("' . htmlspecialchars(formatName($updateData['first_name'], $updateData['last_name'])) . '") updated successfully!';
+            } else {
+                $updateErrors['user_id'] = 'No user found with that ID.';
+            }
+            $updateData = [
+                'user_id' => '', 'first_name' => '', 'last_name' => '', 'email' => '', 'subscription_type' => 'free'
+            ];
+        } catch (PDOException $e) {
+            $updateErrors['email'] = 'That email address is already in use.';
+        }
     }
 }
 ?>
@@ -126,7 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_user'])) {
 
         <h1 class="text-3xl font-bold mb-4">Welcome to the forms section</h1>
         <p class="text-slate-600 text-lg">Manage your forms</p>
-        <p class="text-slate-600 text-lg">Coming Soon</p>
+
 
 
         <!-- forms management interface -->
@@ -151,6 +200,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_user'])) {
                 <p class="text-green-400 text-sm mb-4"><?php echo $searchSuccess; ?></p>
             <?php endif; ?>
         </div>
+
+        <?php if (!empty($searchResults)): ?>
+            <div class="grid grid-cols-5 gap-5 mt-6">
+                <?php foreach ($searchResults as $row): ?>
+                    <div class="bg-slate-700 border border-slate-600 rounded-lg p-4">
+                        <img src="<?php echo htmlspecialchars($row['poster_url']); ?>"
+                             alt="<?php echo htmlspecialchars($row['title']); ?> Poster"
+                             class="w-full h-64 object-cover mb-3 rounded">
+                        <h3 class="text-lg font-semibold mb-1"><?php echo htmlspecialchars($row['title']); ?></h3>
+                        <p class="text-slate-400 text-sm mb-1">Directed by <?php echo htmlspecialchars($row['director']); ?></p>
+                        <p class="text-slate-400 text-sm mb-1"><?php echo htmlspecialchars($row['release_year']); ?></p>
+                        <p class="text-slate-400 text-sm">IMDb: <?php echo htmlspecialchars($row['imdb_rating']); ?></p>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php elseif (isset($_GET['search']) && empty($searchResults) && !$searchError): ?>
+            <p class="text-slate-400 text-sm mt-4">No movies found matching your search.</p>
+        <?php endif; ?>
 
 
 
