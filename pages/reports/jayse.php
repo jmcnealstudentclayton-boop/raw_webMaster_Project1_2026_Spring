@@ -1,11 +1,5 @@
 <?php
-// report_jayse.php — Most Watchlisted Movies
-// Author: Jayse
-// Query: Movies that have been added to at least 1 watchlist, ranked by how many
-//        users have saved them, showing watched vs. unwatched counts
-//        JOIN: movies -> watchlist
-//        WHERE: watchlist_count >= 1 (HAVING) AND movies with a title (sanity check)
-// Uses PDO prepared statements exclusively
+// Author: Not the anomaly, Just Jayse
 
 require_once '../../pageInserts/db_connect.php';
 
