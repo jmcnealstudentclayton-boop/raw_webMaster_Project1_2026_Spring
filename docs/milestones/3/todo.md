@@ -18,7 +18,7 @@
   - Replaced `while/mysqli_fetch_assoc` with `fetchAll/foreach`
 
 - [x] **Remove all `mysqli` usage from `index.php` (root)**
-  - Was missed in original audit — also converted to PDO `prepare/execute/fetchAll/foreach`
+  - Was missed in original audit — also converted to PDO `prepare/execute/fcan youetchAll/foreach`
 
 ---
 

@@ -22,14 +22,14 @@
                     <span class="font-semibold">Justin's Report:</span>
                     <span class="text-slate-400 italic ml-2">"Top-Rated Action Movies"</span>
                 </div>
-                <a href="justin.php" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg">View Report</a>
+                <a href="<?php echo $basePath; ?>/pages/reports/justin.php" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg">View Report</a>
             </div>
             <div class="bg-slate-800 p-4 rounded-lg flex items-center justify-between">
                 <div>
                     <span class="font-semibold">Jayse's Report:</span>
-                    <span class="text-slate-400 italic ml-2">"TBD"</span>
+                    <span class="text-slate-400 italic ml-2">"Most Watchlisted Movies"</span>
                 </div>
-                <span class="px-4 py-2 bg-slate-600 text-slate-400 text-sm font-semibold rounded-lg cursor-not-allowed">Coming Soon</span>
+                <a href="<?php echo $basePath; ?>/pages/reports/jayse.php" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg">View Report</a>
             </div>
         </div>
          

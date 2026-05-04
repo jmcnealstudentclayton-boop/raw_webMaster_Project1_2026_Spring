@@ -1,16 +1,4 @@
-<?php
-// Determine the base path relative to the current script
-$baseDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
-// Walk up to the rawProject root
-if (str_contains($baseDir, '/pages/')) {
-    $basePath = dirname(dirname($baseDir));
-} elseif (str_contains($baseDir, '/pageInserts')) {
-    $basePath = dirname($baseDir);
-} else {
-    $basePath = $baseDir;
-}
-$basePath = rtrim($basePath, '/');
-?>
+<?php require_once __DIR__ . '/base_path.php'; ?>
 <nav class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50 px-6 py-3">
     <div class="flex justify-between items-center mx-auto max-w-6xl flex-wrap gap-3">
         <a href="<?php echo $basePath; ?>/index.php" class="flex items-center gap-2 no-underline group">
